@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 
 class FloatingScroller extends StatefulWidget {
   final ScrollController scrollController;
+  final int depth;
   final Widget child;
   final EdgeInsetsGeometry padding;
 
@@ -21,6 +22,7 @@ class FloatingScroller extends StatefulWidget {
     this.padding = EdgeInsets.zero,
     required this.child,
     required this.scrollController,
+    this.depth = 0,
     this.thumb = const FloatingScrollerDefaultThumb(),
     this.thumbSize = FloatingScrollerDefaultThumb.size,
     this.isAlwaysShown = false,
@@ -75,15 +77,19 @@ class FloatingScrollerState extends State<FloatingScroller> {
     }
 
     if (notification is ScrollStartNotification) {
-      _showTab();
+      if (notification.depth == widget.depth) {
+        _showTab();
+      }
     }
 
     if (notification is ScrollEndNotification) {
-      _requestToHideTab(const Duration(milliseconds: 500));
+      if (notification.depth == widget.depth) {
+        _requestToHideTab(const Duration(milliseconds: 500));
+      }
     }
 
     if (notification is ScrollUpdateNotification) {
-      if (!_isThumbDragging) {
+      if (notification.depth == widget.depth && !_isThumbDragging) {
         updateThumbPosition(notification.metrics.pixels);
       }
     }
